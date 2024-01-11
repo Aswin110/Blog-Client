@@ -1,37 +1,43 @@
 import  {useState} from 'react';
+import {Helmet} from 'react-helmet'
 
-function Layout() {
+function Layout({title}) {
     const [user, setUser] = useState(undefined);
 
     return(
-        <div className="h-full flex flex-col">
-            <div className="sticky top-0 px-6 py-3 flex justify-between flex-wrap">
-                <a href="/">BLOGS</a>
-                <nav>
-                    <ul className="flex gap-4">
-                        {!user ? (
-                            <>
-                                <li>
-                                    <a href='/login'>LOG IN</a>
-                                </li>
-                                <li>
-                                    <a href='/signup'>SIGN UP</a>
-                                </li>
-                            </>
-                        ): (
-                            <>
-                                <a className="px-4 py-2" href="/account">
-                                   Account
-                                </a>
-                                <a className="px-4 py-2" href="/logout">
-                                    Log out
-                                </a>
-                            </>
-                        )}
-                    </ul>
-                </nav>
+        <>
+            <Helmet>
+                <title>{title}</title>
+            </Helmet>
+            <div className="h-full flex flex-col bg-slate-300">
+                <div className="sticky top-0 px-6 py-3 flex justify-between flex-wrap">
+                    <a href="/">BLOGS</a>
+                    <nav>
+                        <ul className="flex gap-4">
+                            {!user ? (
+                                <>
+                                    <li>
+                                        <a href='/login'>LOG IN</a>
+                                    </li>
+                                    <li>
+                                        <a href='/signup'>SIGN UP</a>
+                                    </li>
+                                </>
+                            ): (
+                                <>
+                                    <a className="px-4 py-2" href="/account">
+                                    Account
+                                    </a>
+                                    <a className="px-4 py-2" href="/logout">
+                                        Log out
+                                    </a>
+                                </>
+                            )}
+                        </ul>
+                    </nav>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
