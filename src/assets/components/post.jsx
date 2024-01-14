@@ -7,14 +7,14 @@ function Post() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const apiUrl = 'http://localhost:3007';
+    const apiUrl = import.meta.env.VITE_URL;
+    console.log(apiUrl)
     const id = window.location.pathname.split('/')[2];
 
     useEffect(()=>{
         async function post () {
             try{
                 const res = await axios.get(`${apiUrl}/post/${id}`)
-                console.log(res.data);
                 setPost(res.data);
                 setLoading(false);
             }
@@ -29,7 +29,7 @@ function Post() {
         <>
             {loading?
                 <div className="flex justify-center content-center h-full"> 
-       formatted_date             <LoadingSpinner/> 
+                   <LoadingSpinner/> 
                 </div>:
                 <>
                     <Layout title={post.title}/>
@@ -49,7 +49,7 @@ function Post() {
                                     id="commentContent"
                                     name="commentContent"
                                     rows="3"
-                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
+                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"onChange={(e) => setCommentContent(e.target.value)}
                                     required
                                 ></textarea>
                             </div>

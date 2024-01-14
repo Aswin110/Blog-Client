@@ -5,7 +5,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 function HomePage () {
-    const apiUrl = 'http://localhost:3007';
+    const apiUrl = import.meta.env.VITE_URL;
 
     const [posts, setPosts] = useState({});
     const [loading, setLoading] = useState(true);
