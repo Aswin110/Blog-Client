@@ -11,39 +11,35 @@ function SignUp() {
         confirmPassword:''
     });
     const apiUri = import.meta.env.VITE_URL;
-    const [validation, setValidation] = useState([])
-    const [Error, setError ]= useState(false);
+    const [usernameError, setUsernameError ]= useState(false);
+    const [passwordError, setPasswordError ]= useState(false);
 
     const handleUsername = async () => {
-        const response = await fetch(`${apiUri}/signup/check-username`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username: user.username }),
-        });
+        const response = await axios.post(`${apiUri}/signup/check-username`, { username: user.username });
     
-        const data = await response.json();
-    
-        if (!data.usernameTaken) {
-            setError(false);
+        if (!response.data.usernameTaken) {
+            setUsernameError(false);
         } else {
-            setValidation((prev)=>([...prev,'Username is already taken']));
-            setError(true);
+            setUsernameError(true);
         }
       };
 
-    const handleFormSubmit = async(e) => {
+      const handleFormSubmit = async (e) => {
         e.preventDefault();
-        if (user.password !== user.confirmPassword){
-            setValidation((prev)=> ([...prev,'Password is not same' ]))
-            setError(true);
-            console.log(validation)
-        } else {           
-            console.log(user)
+        if (!usernameError && !passwordError && user.password === user.confirmPassword) {
+          setPasswordError(false);
+          setUsernameError(false);
+          console.log(user);
+          try {
+            const response = await axios.post(`${apiUri}/signup`, user);
+            console.log(response.data); 
+          } catch (error) {
+            console.error('Error during signup:', error);
+          }
+        } else {
+          setPasswordError(true);
         }
-        
-    }
+      };
 
     return (
         <>
@@ -81,7 +77,8 @@ function SignUp() {
                         id='username' 
                         name='username' 
                         value={user.username} 
-                        onChange={(e)=>setUser((prevUser)=>({...prevUser, username: e.target.value}))} 
+                        onChange={(e)=>setUser((prevUser)=>(
+                            {...prevUser, username: e.target.value}))} 
                         placeholder='Username'
                         onBlur={handleUsername} 
                         required={true}  
@@ -111,11 +108,13 @@ function SignUp() {
                     />
                     <button 
                         type='submit' 
+                        disabled={usernameError}
                         className='py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700'>
                             Submit
                     </button>
                 </form>
-                {Error?<div>{validation}</div>:<div>{}</div>}
+                {usernameError && <div className="text-red-500">Username already taken</div>}
+                {passwordError && <div className="text-red-500">Password do not match</div>}
             </div>
         </>
     )
