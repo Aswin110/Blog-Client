@@ -3,9 +3,11 @@ import Layout from "./layout";
 import LoadingSpinner from "./loading";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { jwtDecode } from 'jwt-decode';
 
 function HomePage () {
     const apiUrl = import.meta.env.VITE_URL;
+    const [userDetails, useUserDetails] = useState({})
 
     const [posts, setPosts] = useState({});
     const [loading, setLoading] = useState(true);
@@ -23,7 +25,6 @@ function HomePage () {
         }
         post()
     },[] )
-
 
     return (
         <>

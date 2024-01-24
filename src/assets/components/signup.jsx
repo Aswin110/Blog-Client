@@ -1,6 +1,10 @@
 import Layout from './layout'
-import  {useState} from 'react'
+import  { useState } from 'react'
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 function SignUp() {
     const [user, setUser] = useState({
@@ -10,9 +14,24 @@ function SignUp() {
         password:'',
         confirmPassword:''
     });
+
+    const Navigate = useNavigate();
+
     const apiUri = import.meta.env.VITE_URL;
-    const [usernameError, setUsernameError ]= useState(false);
-    const [passwordError, setPasswordError ]= useState(false);
+    const [ usernameError, setUsernameError ] = useState(false);
+    const [ passwordError, setPasswordError ] = useState(false);
+    const [ signInSuccess, setSignInSuccess ] = useState(false);
+
+    const notify = () => toast.success('Signed in successfully', {
+            position: "top-center",
+            autoClose: 100,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
 
     const handleUsername = async () => {
         const response = await axios.post(`${apiUri}/signup/check-username`, { username: user.username });
@@ -21,6 +40,7 @@ function SignUp() {
             setUsernameError(false);
         } else {
             setUsernameError(true);
+            setSignInSuccess(false);
         }
       };
 
@@ -29,15 +49,29 @@ function SignUp() {
         if (!usernameError && !passwordError && user.password === user.confirmPassword) {
           setPasswordError(false);
           setUsernameError(false);
-          console.log(user);
           try {
             const response = await axios.post(`${apiUri}/signup`, user);
             console.log(response.data); 
+            if (response.data.message) {
+                setUsernameError(true);
+                setSignInSuccess(false);
+            }
+            if (response.data.token) {
+                const token = response.data.token
+                localStorage.setItem('token', token);
+                // const decoded = jwtDecode(token);
+                // console.log('decoded', decoded);
+                setSignInSuccess(true);
+                notify();
+                Navigate('/');
+                return
+            }
           } catch (error) {
             console.error('Error during signup:', error);
           }
         } else {
           setPasswordError(true);
+          setSignInSuccess(false);
         }
       };
 
@@ -115,7 +149,9 @@ function SignUp() {
                 </form>
                 {usernameError && <div className="text-red-500">Username already taken</div>}
                 {passwordError && <div className="text-red-500">Password do not match</div>}
+                {signInSuccess && <div className="text-green-500">Signed in successfully</div>}
             </div>
+            <ToastContainer/>
         </>
     )
 }

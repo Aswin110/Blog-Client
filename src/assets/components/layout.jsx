@@ -1,9 +1,24 @@
-import  {useState} from 'react';
+import  {useState, useEffect} from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import {Link} from 'react-router-dom'
+import { jwtDecode } from 'jwt-decode';
 
 function Layout({title}) {
     const [user, setUser] = useState(undefined);
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+            const decoded = jwtDecode(token)
+            setUser(decoded);
+        }
+      }, [])
+
+    function logOut(){
+        localStorage.removeItem('token')
+        setUser(undefined)
+    }
 
     return(
         <HelmetProvider>
@@ -27,11 +42,11 @@ function Layout({title}) {
                                     </>
                                 ): (
                                     <>
-                                        <Link className="px-4 py-2" to="account">
+                                        {/* <Link to="account">
                                             Account
-                                        </Link>
-                                        <Link className="px-4 py-2" to="logout">
-                                            Log out
+                                        </Link> */}
+                                        <Link to="" refresh='true'>
+                                            <button onClick={logOut}>Log out</button>
                                         </Link>
                                     </>
                                 )}
