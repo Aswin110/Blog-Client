@@ -39,7 +39,7 @@ function HomePage () {
                     :(
                         posts.map((post) => (
                             <div key={post._id} className="border p-4 my-4">
-                                <Link to={`/posts/${post._id}`} className="flex justify-between items-center">
+                                <Link to={`/post/${post._id}`} className="flex justify-between items-center">
                                 <div>
                                     <h1 className="text-xl font-bold mb-2">{post.author}</h1>
                                     <p className="text-gray-700">{post.title}</p>

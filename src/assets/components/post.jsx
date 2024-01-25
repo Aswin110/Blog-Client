@@ -2,13 +2,18 @@ import Layout from "./layout";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "./loading";
 import axios from 'axios'
-axios
+import {useParams} from 'react-router-dom'
+import { jwtDecode } from "jwt-decode";
+
 function Post() {
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [commentContent, setCommentContent] = useState({
+        commentContent: ''
+    })
+    const params = useParams()
 
     const apiUrl = import.meta.env.VITE_URL;
-    console.log(apiUrl)
     const id = window.location.pathname.split('/')[2];
 
     useEffect(()=>{
@@ -16,6 +21,7 @@ function Post() {
             try{
                 const res = await axios.get(`${apiUrl}/post/${id}`)
                 setPost(res.data);
+                console.log('get post', res.data)
                 setLoading(false);
             }
             catch(err) {
@@ -24,6 +30,26 @@ function Post() {
         }
         post()
     },[id])
+
+    const postComment = async(e) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem('token');
+
+        if (token) {
+            const AuthorId = jwtDecode(token).user._id;
+            const comment = {
+                author: AuthorId,
+                content: commentContent
+            }
+            const res = await axios.post(`${apiUrl}/post/${params.post}`, comment)
+            // setPost(res.data);
+            console.log('get post', res.data)
+            // console.log(comment);
+        } else {
+            console.log('you must login token is ', token);
+        }
+    }
 
     return (
         <>
@@ -40,7 +66,7 @@ function Post() {
                         <p className="mt-4">{post.content}</p>
                         <hr/>
 
-                        <form className="mt-8">
+                        <form className="mt-8"  onSubmit={postComment}> 
                             <label htmlFor="commentContent" className="block text-sm font-medium text-gray-700">
                                 Add a Comment
                             </label>
@@ -49,7 +75,8 @@ function Post() {
                                     id="commentContent"
                                     name="commentContent"
                                     rows="3"
-                                    className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"onChange={(e) => setCommentContent(e.target.value)}
+                                    onChange={(e)=>setCommentContent((prevUser)=>({...prevUser, commentContent: e.target.value}))} 
+                                    className="p-2 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 mt-1 block w-full sm:text-sm border-gray-300 rounded-md"
                                     required
                                 ></textarea>
                             </div>
